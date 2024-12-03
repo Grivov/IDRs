@@ -1,0 +1,57 @@
+units nano
+boundary p p p
+atom_style bond
+
+variable index equal ${index_arg}
+variable seed equal v_index*100
+variable nc equal ${n_clients}
+
+read_data OutEq/Checkpoint_clients_${nc}_rep${index}.xyz
+
+reset_timestep 0
+
+bond_style harmonic
+bond_coeff 1 2867.036 0.38
+bond_coeff 2 4600 0.3
+
+pair_style hybrid lj/cut 3.3674 soft 0.67348 zero 0.6
+pair_coeff * * zero 0.6
+pair_coeff 1 1 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 2 lj/cut 4.14 0.6 0.67348
+pair_coeff 3 3 lj/cut 4.14 0.6 0.67348
+pair_coeff 1 4 lj/cut 4.14 1.8 2.0204
+pair_coeff 4 4 lj/cut 4.14 3 3.3674
+pair_coeff 2 3 soft -37.26 0.3
+pair_coeff 2 5 soft -4.14 0.3
+pair_coeff 3 5 soft -4.14 0.3
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+neighbor 1.6326 multi
+
+comm_style tiled
+neigh_modify every 1 delay 0
+
+group polymer type 1 2 3
+group clients type 4 5
+group client_coms type 4
+
+fix 1 polymer nve
+fix 2 polymer langevin 300 300 1 ${seed} zero yes
+fix 3 clients rigid/nve/small molecule langevin 300 300 1 ${seed}
+fix 5 all balance 1000 1.1 rcb
+
+thermo 10000000
+timestep 0.01
+
+
+
+dump 4 client_coms xyz 10000 OutC/trajectory_clients_${nc}_rep${index}.xyz
+
+compute         myChunk2 client_coms chunk/atom bin/1d x lower 0.02 units reduced
+fix             densityRegions2 client_coms ave/chunk 1000 90000 95000000 myChunk2 density/number file Out_profile/density_clients_${nc}_rep${index}.dat
+dump 5 all xyz 2000000 OutC/FULL_trajectory_clients_${nc}_rep${index}.xyz
+run 100000000
+
+
+

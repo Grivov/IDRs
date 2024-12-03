@@ -1,0 +1,3 @@
+# Time-averaged data for fix 4
+# TimeStep c_thermo_press[1] c_thermo_press[2] c_thermo_press[3]
+100000000 0.172118 0.165909 0.170065

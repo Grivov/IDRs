@@ -1,0 +1,88 @@
+units nano
+boundary p p p
+atom_style bond
+
+variable rep equal ${replica}
+variable vf equal ${volume_fraction} 
+variable seed equal v_rep*(v_vf+1)
+
+read_data initial_vf${vf}/polymer_system_vf${vf}_rep${rep}.data 
+
+mass * 0.0565487
+#mass * 5.65487
+
+
+bond_style harmonic
+bond_coeff 1 2867.036 0.38
+
+neighbor 1.0 multi
+
+comm_style tiled
+neigh_modify every 1 delay 0
+
+fix 1 all nve
+fix 2 all langevin 300 300 0.01 ${seed} 
+fix 3 all balance 1000 1.1 rcb
+
+pair_style soft 0.67348
+pair_coeff 1 1 207 0.67348
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+min_style       fire
+timestep        0.00000000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.0000000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.000000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.00000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.0000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.00001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.0001
+minimize 0.0 1.0e-8 10000 1000000
+#timestep        0.001
+#minimize 0.0 1.0e-8 10000 1000000
+
+run 100000
+
+
+pair_style lj/cut 3.3674
+pair_coeff 1 1 4.14 0.6 0.67348
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+min_style       fire
+timestep        0.00000000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.0000000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.000000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.00000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.0000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.000001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.00001
+minimize 0.0 1.0e-8 10000 1000000
+timestep        0.0001
+minimize 0.0 1.0e-8 10000 1000000
+#timestep        0.001
+#minimize 0.0 1.0e-8 10000 1000000
+
+run 10000000
+reset_timestep 0
+
+fix 4 all ave/time 1 100000000 100000000 c_thermo_press[1] c_thermo_press[2] c_thermo_press[3] file pressure_vf${vf}/pressure_vf${vf}_rep${rep}.txt
+
+thermo 1000000
+#dump 4 all xyz 200000 traj_vf${vf}/trajectory_vf${vf}_rep${rep}.xyz
+
+run 100000000 # 400000000 for figure 4

@@ -1,0 +1,47 @@
+units nano
+boundary p p p
+atom_style bond
+
+variable index equal ${index_arg}
+variable seed equal v_index*100
+variable temperature equal 300
+
+read_restart Out3/Sticker58_Chain450_NP50_Particle50_A9_Rep${index}_3.restart
+
+pair_style hybrid lj/cut 3.3674 soft 0.67348 zero 0.6
+pair_coeff * * zero 0.6
+pair_coeff 1 1 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 2 lj/cut 4.14 0.6 0.67348
+pair_coeff 3 3 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 3 soft -37.26 0.3
+pair_coeff 1 4 lj/cut 2.6130024 1.8 2.0204 #0.63116 kBT to match the B2
+pair_coeff 4 4 lj/cut 2.6130024 3 3.3674
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+
+bond_style harmonic
+bond_coeff 1 2867.036 0.38
+bond_coeff 2 4600 0.3
+
+neighbor 1.6326 multi
+
+comm_style tiled
+neigh_modify every 1 delay 0
+
+group polymer type 1 2 3
+group particle type 4
+
+fix 1 all nve
+fix 2 all langevin ${temperature} ${temperature} 1 ${seed} zero yes
+fix 5 all balance 1000 1.05 rcb
+
+thermo 10000000
+timestep 0.01
+
+# Equlibration
+run 50000000
+
+dump 4 all xyz 100000 Out_${temperature}/pols_T${temperature}_rep${index}.xyz
+
+run 100000000

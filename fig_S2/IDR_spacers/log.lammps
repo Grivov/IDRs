@@ -1,0 +1,224 @@
+LAMMPS (21 Nov 2023)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+units nano
+boundary p p p
+atom_style bond
+
+variable index equal ${index_arg}
+variable index equal 3
+variable seed equal v_index*100
+variable temperature equal 318
+
+read_restart Out3/Sticker58_Chain450_NP50_Particle50_A9_Rep${index}_3.restart
+read_restart Out3/Sticker58_Chain450_NP50_Particle50_A9_Rep3_3.restart
+Reading restart file ...
+  restart file = 21 Nov 2023, LAMMPS = 21 Nov 2023
+WARNING: Restart file used different # of processors: 96 vs. 48 (src/src/read_restart.cpp:626)
+  restoring atom style bond from restart
+  orthogonal box = (-50 -12.5 -12.5) to (50 12.5 12.5)
+  8 by 2 by 3 MPI processor grid
+  restoring pair style hybrid from restart
+  restoring bond style harmonic from restart
+  25450 atoms
+  25350 bonds
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        1        1       
+  special bond factors coul:  0        1        1       
+     3 = max # of 1-2 neighbors
+     8 = max # of special neighbors
+  special bonds CPU = 0.003 seconds
+  read_restart CPU = 0.066 seconds
+
+pair_style hybrid lj/cut 3.3674 soft 0.67348 zero 0.6
+pair_coeff * * zero 0.6
+pair_coeff 1 1 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 2 lj/cut 4.14 0.6 0.67348
+pair_coeff 3 3 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 3 soft -37.26 0.3
+pair_coeff 1 4 lj/cut 2.6130024 1.8 2.0204 #0.63116 kBT to match the B2
+pair_coeff 4 4 lj/cut 2.6130024 3 3.3674
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+
+bond_style harmonic
+bond_coeff 1 2867.036 0.38
+bond_coeff 2 4600 0.3
+
+neighbor 1.6326 multi
+
+comm_style tiled
+neigh_modify every 1 delay 0
+
+group polymer type 1 2 3
+25400 atoms in group polymer
+group particle type 4
+50 atoms in group particle
+
+fix 1 all nve
+fix 2 all langevin ${temperature} ${temperature} 1 ${seed} zero yes
+fix 2 all langevin 318 ${temperature} 1 ${seed} zero yes
+fix 2 all langevin 318 318 1 ${seed} zero yes
+fix 2 all langevin 318 318 1 300 zero yes
+fix 5 all balance 1000 1.05 rcb
+
+thermo 10000000
+timestep 0.01
+
+# Equlibration
+run 50000000
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- neighbor multi command: doi:10.1016/j.cpc.2008.03.005, doi:10.1007/s40571-020-00361-2
+
+@Article{Intveld08,
+ author =  {in 't Veld, P. J. and S. J.~Plimpton and G. S. Grest},
+ title =   {Accurate and Efficient Methods for Modeling Colloidal
+            Mixtures in an Explicit Solvent using Molecular Dynamics},
+ journal = {Comput.\ Phys.\ Commut.},
+ year =    2008,
+ volume =  179,
+ pages =   {320--329}
+}
+
+@article{Shire2020,
+ author = {Shire, Tom and Hanley, Kevin J. and Stratford, Kevin},
+ title = {{DEM} Simulations of Polydisperse Media: Efficient Contact
+          Detection Applied to Investigate the Quasi-Static Limit},
+ journal = {Computational Particle Mechanics},
+ year = {2020}
+@article{Monti2022,
+ author = {Monti, Joseph M. and Clemmer, Joel T. and Srivastava, 
+           Ishan and Silbert, Leonardo E. and Grest, Gary S. 
+           and Lechman, Jeremy B.},
+ title = {Large-scale frictionless jamming with power-law particle 
+          size distributions},
+ journal = {Phys. Rev. E},
+ volume = {106}
+ issue = {3}
+ year = {2022}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Generated 0 of 6 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 5
+  ghost atom cutoff = 5
+  binsize = 0.9663, bins = 104 26 26
+  4 neighbor lists, perpetual/occasional/extra = 4 0 0
+  (1) pair lj/cut, perpetual, skip from (4)
+      attributes: half, newton on
+      pair build: skip
+      stencil: none
+      bin: none
+  (2) pair soft, perpetual, skip trim from (4)
+      attributes: half, newton on, cut 1.9326
+      pair build: skip/trim
+      stencil: none
+      bin: none
+  (3) pair zero, perpetual, skip trim from (4)
+      attributes: half, newton on, cut 2.2326
+      pair build: skip/trim
+      stencil: none
+      bin: none
+  (4) neighbor class addition, perpetual
+      attributes: half, newton on
+      pair build: half/multi/newton
+      stencil: half/multi/3d
+      bin: multi
+Per MPI rank memory allocation (min/avg/max) = 6.857 | 7.016 | 7.278 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+1061000000   298.90855     -49383.986      59802.134      167955.68      0.035305027    62500        
+1070000000   318.04459     -33915.649      63400.524      197107.92     -0.04566568     62500        
+1080000000   319.02126     -33969.461      63478.575      197646.9      -0.05878657     62500        
+1090000000   317.22238     -30401.875      63527.007      200314.83     -0.0029845674   62500        
+1100000000   317.52833     -31616.546      64200.391      199934.8      -0.034276223    62500        
+1110000000   319.80221     -32566.596      64318.463      200301.25     -0.13369811     62500        
+1111000000   319.03728     -30050.824      64329.064      202424.47     -0.10004947     62500        
+Loop time of 12961.1 on 48 procs for 50000000 steps with 25450 atoms
+
+Performance: 3333054.400 ns/day, 0.000 hours/ns, 3857.702 timesteps/s, 98.179 Matom-step/s
+99.6% CPU use with 48 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1341       | 1571       | 1674.5     | 193.1 | 12.12
+Bond    | 239.61     | 251.44     | 266.43     |  39.6 |  1.94
+Neigh   | 2226.7     | 2274.3     | 2330.3     |  72.0 | 17.55
+Comm    | 4974.8     | 5745.7     | 6249.5     | 464.9 | 44.33
+Output  | 0.00051525 | 0.00053684 | 0.0014583  |   0.0 |  0.00
+Modify  | 2099.1     | 2636       | 3388.6     | 744.7 | 20.34
+Other   |            | 482.6      |            |       |  3.72
+
+Nlocal:        530.208 ave         533 max         528 min
+Histogram: 4 0 10 0 14 0 13 0 6 1
+Nghost:        3821.31 ave        5441 max        1531 min
+Histogram: 2 2 0 4 4 13 7 10 3 3
+Neighs:              0 ave           0 max           0 min
+Histogram: 48 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Ave special neighs/atom = 1.9921415
+Neighbor list builds = 1763883
+Dangerous builds = 
+d
+dump 4 all xyz 100000 Out_${temperature}/pols_T${temperature}_rep${index}.xyz
+dump 4 all xyz 100000 Out_318/pols_T${temperature}_rep${index}.xyz
+dump 4 all xyz 100000 Out_318/pols_T318_rep${index}.xyz
+dump 4 all xyz 100000 Out_318/pols_T318_rep3.xyz
+
+run 100000000
+Generated 0 of 6 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 7.092 | 7.258 | 7.376 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+1111000000   319.03728     -30050.824      64329.064      202424.47     -0.10004947     62500        
+1120000000   316.5439      -31699.307      63130.641      198263.45      0.05660647     62500        
+1130000000   317.92539     -30991.203      63103.787      199672.8      -0.11974255     62500        
+1140000000   319.64402     -27984.951      63522.467      204003.52     -0.052646396    62500        
+1150000000   317.33625     -31048.044      63346.61       199548.28     -0.06376806     62500        
+1160000000   319.76029     -30845.492      63040.185      200721.98     -0.045785379    62500        
+1170000000   315.78937     -31466.078      63494.007      198462.37     -0.059850593    62500        
+1180000000   318.19115     -30311.437      63837.09       201225.94     -0.056744195    62500        
+1190000000   318.41956     -29661.297      64119.224      202278.6      -0.12464212     62500        
+1200000000   321.00748     -30734.669      63341.252      201791.19     -0.090448404    62500        
+1210000000   320.58317     -29757.168      62945.794      202149.61     -0.019599403    62500        
+1211000000   318.06161     -30876.942      63122.342      199877.41     -0.081167092    62500        
+Loop time of 24797.9 on 48 procs for 100000000 steps with 25450 atoms
+
+Performance: 3484167.907 ns/day, 0.000 hours/ns, 4032.602 timesteps/s, 102.630 Matom-step/s
+99.6% CPU use with 48 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2680.9     | 3025.4     | 3303.5     | 270.4 | 12.20
+Bond    | 475.64     | 499.44     | 550.09     |  84.0 |  2.01
+Neigh   | 4319.9     | 4431.2     | 4540.1     | 106.9 | 17.87
+Comm    | 9592.1     | 10630      | 11812      | 618.8 | 42.87
+Output  | 0.80925    | 1.2169     | 1.6493     |  22.9 |  0.00
+Modify  | 4190       | 5261.4     | 6270.3     | 927.6 | 21.22
+Other   |            | 949.6      |            |       |  3.83
+
+Nlocal:        530.208 ave         533 max         528 min
+Histogram: 2 0 10 0 18 0 13 0 4 1
+Nghost:        3686.15 ave        5471 max        2092 min
+Histogram: 3 2 4 7 14 5 7 2 2 2
+Neighs:              0 ave           0 max           0 min
+Histogram: 48 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Ave special neighs/atom = 1.9921415
+Neighbor list builds = 3535452
+Dangerous builds = 0
+Total wall time: 10:29:19
+

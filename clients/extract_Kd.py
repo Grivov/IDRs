@@ -14,9 +14,9 @@ def compute_C(input_file):
     total_stickers = []
     
     for ts in u.trajectory:
-        beads4 = u.select_atoms("type 4 and prop x > -14 and prop x < 14")
-        beads2 = u.select_atoms("type 2 and prop x > -14 and prop x < 14")
-        beads3 = u.select_atoms("type 3 and prop x > -14 and prop x < 14")
+        beads4 = u.select_atoms("type 4 and prop x > -10 and prop x < 10")
+        beads2 = u.select_atoms("type 2 and prop x > -10 and prop x < 10")
+        beads3 = u.select_atoms("type 3 and prop x > -10 and prop x < 10")
         #print(len(beads4), len(beads2), len(beads3), ts, "%")
         if len(beads4) == 0: 
             continue
@@ -63,7 +63,8 @@ for epsilon in range(1, 11):
     V = 28 * 25 * 25 - (N * 4 * 3.14 * 1.2**3 / 3)
     v = 4 * 3.14 * (1.8**3 - 1.2**3)/ 3
 
-    Kd = (N*T - N*B) / (V*B - N*v*B)
+    #Kd = (N*T - N*B) / (V*B - N*v*B)
+    Kd = (N*T - N*B) / (V*B)
     rho = T/V
     
     Kd_array.append(Kd)

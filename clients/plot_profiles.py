@@ -6,10 +6,8 @@ import matplotlib.cm as cm
 import os 
 
 # Constants
-BOX_RADIUS = 0.3
-BOX_HEIGHT = BOX_RADIUS - 0.38 / 2
-V1 = np.pi / 3 * (3 * BOX_RADIUS - BOX_HEIGHT) * BOX_HEIGHT**2
-V2 = 4 * np.pi / 3 * BOX_RADIUS**3 - 2 * V1
+RADIUS = 1.5
+V2 = 4 * np.pi / 3 * RADIUS**3 
 
 def tanh_func(x, A, B, C, D):
     """Hyperbolic tangent function for curve fitting."""
@@ -148,7 +146,7 @@ def analyze_density_profiles():
 
     # Save and display the plot
     #plt.savefig('clients_profiles.png', dpi=600, bbox_inches='tight')
-    #plt.show()
+    plt.show()
 
 
 analyze_density_profiles()

@@ -1,0 +1,71 @@
+units nano
+boundary p p p
+atom_style bond
+
+read_data Sticker10_Chain10_NP50_Particle50.initial
+
+pair_style hybrid lj/cut 3.3674 soft 0.3 zero 2
+pair_coeff * * zero 2
+pair_coeff 1 1 lj/cut 4.14 2 2.2449
+pair_coeff 2 2 lj/cut 4.14 0.6 0.67348
+pair_coeff 3 3 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 3 soft 0 0.3
+pair_coeff 1 4 lj/cut 2.613 2.5 2.8062
+pair_coeff 4 4 lj/cut 2.613 3 3.3674
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+bond_style hybrid harmonic fene/expand
+bond_coeff 1 fene/expand 0.53549 14.03 0 0 3.0707
+bond_coeff 2 harmonic 414 1
+
+neighbor 3.0 multi
+
+region wallx block -30 30 -30 30 -30 30 open 3 open 4 open 5 open 6
+
+group polymer type 1 2 3
+group particle type 4
+
+comm_style tiled
+neigh_modify every 1 delay 0 check yes
+comm_modify cutoff 20.0
+
+fix 1 all nve
+fix 2 all langevin 300 300 1 8813256
+fix 4 polymer wall/region wallx lj126 4.14 2 2.2449
+fix 5 all balance 1000 1.1 rcb
+
+thermo 10000000
+timestep 0.01
+
+dump 1 all movie 1000000 Out/Sticker10_Chain10_NP50_Particle50_A9.4_Rep10_1.mpeg type type zoom 4 box yes 0.01 bond type 0.2 view 88 88 size 1000 400 shiny 0.5
+dump_modify 1 acolor 1 white
+dump_modify 1 acolor 2 red
+dump_modify 1 acolor 3 blue
+dump_modify 1 acolor 4 green
+dump_modify 1 bcolor 1 white
+dump_modify 1 adiam 1 2
+dump_modify 1 adiam 2 0.6
+dump_modify 1 adiam 3 0.6
+dump_modify 1 adiam 4 3
+
+run 10000000
+
+variable A equal "ramp(0,-38.916)"
+fix 3 all adapt 1 pair soft a 2 3 v_A
+
+run 40000000
+
+unfix 3
+pair_coeff 2 3 soft -38.916 0.3
+run 10000000
+
+unfix 4
+fix fixCOM polymer recenter INIT INIT INIT
+run 50000000
+
+dump 4 all xyz 50000 Out/Sticker10_Chain10_NP50_Particle50_A9.4_Rep10.xyz
+run 200000000
+
+write_restart Out/Sticker10_Chain10_NP50_Particle50_A9.4_Rep10.restart
+

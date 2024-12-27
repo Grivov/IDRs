@@ -12,7 +12,7 @@ def load_and_symmetrize(filename):
 
 def main():
     # Base directory where files are stored
-    base_dir = os.path.expanduser("~/Desktop/volume_fractions/")
+    base_dir = os.path.expanduser(".")
     
 
     # File names
@@ -35,7 +35,7 @@ def main():
     y_limits = [
         (0, 0.1),  # Upper left
         (0, 0.1),  # Upper right
-        (0, 0.019),  # Lower left
+        (0, 0.025),  # Lower left
         (0, 0.025)   # Lower right
     ]
     
@@ -71,7 +71,7 @@ def main():
         ax.set_ylim(ylim)  # Set y-axis limits
         
     #plt.tight_layout()
-    plt.savefig('volume_fractions_green.png', dpi = 800)
+    plt.savefig('volume_fractions_green.png', dpi = 300)
     plt.show()
 
 if __name__ == "__main__":

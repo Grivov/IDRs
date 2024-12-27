@@ -22,20 +22,14 @@ def scientific_formatter(x, p):
 
     return f'${coef:.1f}\\times10^{{{int(exp)}}}$'
 
-# Create figure with specified layout
-
-    #fig, axs = plt.subplots(2, 2, figsize=(40, 10))
 fig = plt.figure(figsize=(7, 11))
 
 gs = fig.add_gridspec(2, 2, height_ratios=[2, 1], wspace=0.3, hspace=0.25)
 
-# Top panel (spans both columns)
 ax1 = fig.add_subplot(gs[0, :])
 
-# Bottom left panel
 ax2 = fig.add_subplot(gs[1, 0])
 
-# Bottom right panel
 ax3 = fig.add_subplot(gs[1, 1])
 
 for ax in [ax1, ax2, ax3]:
@@ -54,7 +48,6 @@ press = np.loadtxt('pressures.txt')[::-1]
 nu = 0.588
 xis = (4.14 / (3 * nu - 1) / press) ** (1/3)
 
-# Collect data and perform fitting
 all_R = []
 all_F = []
 all_xis = []
@@ -65,7 +58,7 @@ for filename, xi, phi in zip(filenames, xis, phis):
     data = np.loadtxt(filename, delimiter=' ')
     R = data[:18, 0]
     y = data[:18, 1]
-    F = -np.log(y) - (4 * np.pi / 3) / (3 * 0.588 - 1) * (R / xi)**3 #+ np.log(1 - phi)
+    F = -np.log(y) - (4 * np.pi / 3) / (3 * 0.588 - 1) * (R / xi)**3 
     all_R.extend(R)
     all_F.extend(F)
     all_xis.extend([xi] * len(R))
@@ -89,7 +82,7 @@ for i, (filename, xi, phi) in enumerate(zip(filenames, xis, phis)):
     data = np.loadtxt(filename, delimiter=' ')
     R = data[:18, 0]
     y = data[:18, 1]
-    F = -np.log(y) - (4 * np.pi / 3) / (3 * 0.588 - 1) * (R / xi)**3 #+ np.log(1 - phi) 
+    F = -np.log(y) - (4 * np.pi / 3) / (3 * 0.588 - 1) * (R / xi)**3
     
     R_fit = np.linspace(min(R), max(R), 500)
     F_fit = func2(params, R_fit, xi, phi)
@@ -106,8 +99,6 @@ for i, (filename, xi, phi) in enumerate(zip(filenames, xis, phis)):
 
 ax1.set_xscale('log')
 ax1.set_yscale('log')
-#ax1.set_xlabel('log(R) (log nm)', fontsize=12)
-#ax1.set_ylabel('log(F) (log kT)', fontsize=12)
 ax1.legend(title='Correlation lengths', fontsize=8, title_fontsize=11)
 
 print(data[:18, 0])
@@ -141,7 +132,7 @@ print(c, ' c for correllation length')
 vf_fine = np.linspace(0.027, 0.09, 100)
 xi_line = saw(vf_fine, c)
 
-colors = plt.cm.viridis(np.linspace(0, 1, len(phis)))
+colors = plt.cm.viridis(np.linspace(1, 0, len(phis)))
 for i, (vf_value, xi_value) in enumerate(zip(phis, xis)):
     ax2.plot(vf_value, xi_value, 'o', markersize=10, color=colors[i])
 
@@ -168,11 +159,18 @@ ax2.set_xticklabels(xtick2_labels)  # Set the labels of the y-ticks
 R_pred = np.linspace(0.01, 3, 100)
 for i, phi in enumerate(phis):
     xi_pred = saw(phi, c)
-    F_pred = func2(params, R_pred, xi_pred, phi) # - np.log(1 - phi) 
+    F_pred = func2(params, R_pred, xi_pred, phi)
     y_pred = np.exp(-F_pred)
     print(np.exp(- func2(params, 2, xi_pred, phi)))
     ax3.plot(R_pred, y_pred, color=colors[i], alpha = 0.4)
-phi = 0.050
+
+BOND_LENGTH = 0.38
+BEAD_RADIUS = 0.3
+R = BEAD_RADIUS
+H = R - BOND_LENGTH / 2
+V1 = np.pi / 3 * (3 * R - H) * H**2
+V2 = 4 * np.pi / 3 * R**3 - 2 * V1
+phi = 0.4 * 250 / 110* 0.6 * V2
 xi_pred = saw(phi, c)
 print(xi_pred, 'xi_pred')
 F_pred = func2(params, R_pred, xi_pred, phi) 

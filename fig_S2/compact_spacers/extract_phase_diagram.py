@@ -72,7 +72,7 @@ def fit_critical_point(T_values, c_dense_values, c_dilute_values):
     c_c_fit, A_fit = popt_rectilinear
     return T_c_fit, c_c_fit, d_fit, A_fit
 
-def plot_phase_diagram(T_values, c_dense_values, c_dilute_values, T_c, c_c):
+def plot_phase_diagram(T_values, c_dense_values, c_dilute_values, T_c, c_c, d, A):
     """
     Plots the phase diagram using a UnivariateSpline for smoothing with enhanced visuals.
 
@@ -91,43 +91,53 @@ def plot_phase_diagram(T_values, c_dense_values, c_dilute_values, T_c, c_c):
     sort_idx = np.argsort(concentrations)
     x = concentrations[sort_idx]
     y = temperatures[sort_idx]
-
-    # Create a UnivariateSpline
-    spl = UnivariateSpline(x, y, k=2, s=1)
-
-    # Generate points on the spline
-    x_new = np.linspace(x.min(), x.max(), 500)
-    y_new = spl(x_new)
-
-    # Plotting
     plt.figure(figsize=(10, 10))
+    plt.ylim(299, 325)
+    # Create a UnivariateSpline
+    #spl = UnivariateSpline(x, y, k=2, s=1)
+    # Generate points on the spline
+    #x_new = np.linspace(x.min(), x.max(), 500)
+    #y_new = spl(x_new)
+    T_smooth = np.linspace(299, T_c, 1000)
+    rho_smooth_high = (d * (1 - T_smooth / T_c)) ** 0.326 / 2 + (c_c + A * (T_smooth - T_c))
+    rho_smooth_low = rho_smooth_high - (d * (1 - T_smooth / T_c)) ** 0.326
+    plt.plot(rho_smooth_low, T_smooth, 'k--', linewidth=3)
+    plt.plot(rho_smooth_high, T_smooth, 'k--', linewidth=3, label='Phase boundary')
+    plt.plot([rho_smooth_low[-1], rho_smooth_high[-1]], [T_c, T_c], 'k--', linewidth=3)
+    
+    #plt.scatter(rho_smooth_low, T_smooth)
+    #plt.scatter(rho_smooth_high, T_smooth)
 
     # Plot dense phase points
     plt.scatter(
         c_dense_values, T_values, 
-        color='lightcoral', s=200, label='Dense Phase'
+        color='lightcoral', s=200, label='Dense phase'
     )
     
     # Plot dilute phase points
     plt.scatter(
         c_dilute_values, T_values, 
-        color='lightskyblue', s=200, label='Dilute Phase'
+        color='lightskyblue', s=200, label='Dilute phase'
     )
-    
+ 
     # Plot critical point
     plt.scatter(
         [c_c], [T_c], 
-        color='gold', s=200, label='Critical Point'
+        color='gold', s=200, label='Critical point'
     )
+    # Get the current tick locations
+    current_ticks = plt.xticks()[0]
 
+    # Set new tick locations and labels
+    plt.xticks(current_ticks, labels=[f'{int(tick*100)}' for tick in current_ticks])
     # Plot the spline curve
-    plt.plot(x_new, y_new, 'k--', label='Phase Boundary (Spline)', linewidth=3)
+    #plt.plot(x_new, y_new, 'k--', label='Phase Boundary (Spline)', linewidth=3)
 
     # Labels, legend, and aesthetics
-    plt.xlabel('Volume fraction', fontsize=20)
-    plt.ylabel('T (K)', fontsize=20)
-    plt.title('Phase Diagram with Smoothed Spline', fontsize=20)
-    plt.legend(fontsize=20)
+    #plt.xlabel('Volume fraction', fontsize=20)
+    #plt.ylabel('T (K)', fontsize=20)
+    #plt.title('Phase Diagram with Smoothed Spline', fontsize=20)
+    plt.legend(loc='lower center',fontsize=20)
     plt.tight_layout()
     plt.savefig('PD_compact', dpi = 500)
     plt.show()
@@ -164,7 +174,7 @@ def main():
     print(f"d = {d:.5f}")
     print(f"A = {A:.5f}")
 
-    plot_phase_diagram(T_values, c_dense_values, c_dilute_values, T_c, c_c)
+    plot_phase_diagram(T_values, c_dense_values, c_dilute_values, T_c, c_c, d, A)
 
 if __name__ == "__main__":
     main()

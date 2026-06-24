@@ -1,0 +1,94 @@
+units nano
+boundary p p p
+atom_style bond
+
+read_data Sticker58_Chain450_NP50_Particle50_Rep1.initial
+
+pair_style hybrid lj/cut 3.3674 soft 0.67348 zero 0.6
+pair_coeff * * zero 0.6
+pair_coeff 1 1 soft 12.42 0.67348
+pair_coeff 2 2 soft 12.42 0.67348
+pair_coeff 3 3 soft 12.42 0.67348
+pair_coeff 2 3 soft 0 0.3
+pair_coeff 1 4 lj/cut 4.14 1.8 2.0204
+pair_coeff 4 4 lj/cut 4.14 3 3.3674
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+bond_style harmonic
+bond_coeff 1 2867.036 0.38
+bond_coeff 2 4600 0.3
+
+neighbor 1.6326 multi
+
+comm_style tiled
+neigh_modify every 1 delay 0
+
+region wallx block -30 30 -30 30 -30 30 open 3 open 4 open 5 open 6
+
+group polymer type 1 2 3
+group particle type 4
+
+fix 1 all nve
+fix 2 all langevin 300 300 1 6892846 zero yes
+fix 4 polymer wall/region wallx lj126 4.14 0.6 0.67348
+fix 5 all balance 100000 1.1 rcb
+
+thermo 10000000
+timestep 0.01
+
+dump 1 all movie 1000000 Out/Sticker58_Chain450_NP50_Particle50_A9_Rep1.mpeg type type zoom 4 box yes 0.01 bond type 0.2 view 88 88 size 1000 400 shiny 0.5
+dump_modify 1 acolor 1 white
+dump_modify 1 acolor 2 red
+dump_modify 1 acolor 3 blue
+dump_modify 1 acolor 4 green
+dump_modify 1 bcolor 1 white
+dump_modify 1 bcolor 2 white
+dump_modify 1 adiam 1 0.6
+dump_modify 1 adiam 2 0.6
+dump_modify 1 adiam 3 0.6
+dump_modify 1 adiam 4 3
+
+run 10000000
+
+pair_style hybrid lj/cut 3.3674 soft 0.67348 zero 0.6
+pair_coeff * * zero 0.6
+pair_coeff 1 1 soft 207 0.67348
+pair_coeff 2 2 soft 207 0.67348
+pair_coeff 3 3 soft 207 0.67348
+pair_coeff 2 3 soft 0 0.3
+pair_coeff 1 4 lj/cut 4.14 1.8 2.0204
+pair_coeff 4 4 lj/cut 4.14 3 3.3674
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+run 1000000
+
+pair_style hybrid lj/cut 3.3674 soft 0.67348 zero 0.6
+pair_coeff * * zero 0.6
+pair_coeff 1 1 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 2 lj/cut 4.14 0.6 0.67348
+pair_coeff 3 3 lj/cut 4.14 0.6 0.67348
+pair_coeff 2 3 soft 0 0.3
+pair_coeff 1 4 lj/cut 4.14 1.8 2.0204
+pair_coeff 4 4 lj/cut 4.14 3 3.3674
+pair_modify shift yes
+special_bonds lj/coul 0.0 1.0 1.0
+
+variable A equal "ramp(0,-37.26)"
+fix 3 all adapt 1 pair soft a 2 3 v_A
+
+run 40000000
+
+unfix 3
+pair_coeff 2 3 soft -37.26 0.3
+run 10000000
+
+unfix 4
+run 50000000
+
+dump 4 all xyz 1000000 Out/Sticker58_Chain450_NP50_Particle50_A9_Rep1.xyz
+run 50000000
+
+write_restart Out/Sticker58_Chain450_NP50_Particle50_A9_Rep1.restart
+

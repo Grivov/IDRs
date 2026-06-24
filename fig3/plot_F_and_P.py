@@ -39,8 +39,8 @@ log_partitioning_small = -np.log(partitioning_small)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6), gridspec_kw={'wspace': 0.25})
 
-ax1.plot(n, log_partitioning_large, color=green, marker='s', markersize=22, linewidth=5, label='Compact spacers')
 ax1.plot(n, log_partitioning_small, color=orng, marker='o', markersize=22, linewidth=5, label='IDR spacers', zorder = 9)
+ax1.plot(n, log_partitioning_large, color=green, marker='s', markersize=22, linewidth=5, label='Compact spacers')
 ax1.set_ylim(0, 8)
 ax1.legend(fontsize=20)
 
@@ -54,7 +54,6 @@ ax2.plot(1.5, P_sim_large, color='black', marker='+', markersize=40, markeredgew
 ax2.plot(1.5, P_sim_small, color='black', marker='+', markersize=40, markeredgewidth=3, linestyle='None', zorder = 10)
 
 
-ax2.legend(fontsize=20)
 
 plt.tight_layout()
 plt.savefig('small_large_spacers.png', dpi=600, bbox_inches='tight')
